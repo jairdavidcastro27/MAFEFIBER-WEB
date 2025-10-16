@@ -1,0 +1,13 @@
+---
+import Base from '../../layouts/Base.astro';
+import AdminGuard from '../../components/admin/AdminGuard';
+import AdminDashboard from '../../components/admin/AdminDashboard';
+
+---
+
+
+<Base title="Panel de Administración">
+  <AdminGuard client:load>
+    <AdminDashboard client:load />
+  </AdminGuard>
+</Base>

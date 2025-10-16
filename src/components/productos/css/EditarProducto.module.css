@@ -1,0 +1,193 @@
+/* Container similar to EditarPlan but adapted for products */
+.adminContainer {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+  background: linear-gradient(135deg, #181c2f 0%, #23243a 50%, #0a0a0a 100%);
+  color: #ffffff;
+  min-height: 100vh;
+  border-radius: 12px;
+}
+
+.formTitle {
+  font-size: 1.8rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  background: linear-gradient(to right, #3498db, #2ecc71);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.gridLayout {
+  display: grid;
+  grid-template-columns: 1fr 420px;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+.leftCol { width: 100%; }
+.rightCol { width: 100%; }
+
+
+
+.cardForm {
+  background: linear-gradient(135deg, #2b3344 0%, #232735 100%);
+  padding: 1rem;
+  border-radius: 10px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.35);
+}
+
+.formSubtitle {
+  margin: 0 0 1rem 0;
+  font-size: 1.2rem;
+  color: #e6eef8;
+}
+
+.planForm {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.75rem;
+}
+
+.formGroup { display:flex; flex-direction:column; gap:0.5rem; }
+.formGroup label { font-size:0.9rem; color:#b0b0b0; font-weight:500; }
+
+.formInput, .formTextarea {
+  padding: 0.7rem;
+  border-radius: 8px;
+  border: 1px solid #444;
+  background: linear-gradient(180deg, #34495e 0%, #2c3e50 100%);
+  color: #e6eef8;
+}
+
+.formTextarea { min-height:80px; resize:vertical; }
+
+.formActions { display:flex; gap:0.75rem; }
+
+.formButton { padding:0.6rem 1rem; border-radius:8px; border:none; cursor:pointer; font-weight:600; }
+.formButton.primary { background: linear-gradient(90deg,#3498db 0%,#2ecc71 100%); color:#fff; }
+.formButton.secondary { background: linear-gradient(90deg,#7f8c8d 0%,#95a5a6 100%); color:#fff; }
+
+/* Convenience modifier classes used by the component */
+.primary { background: linear-gradient(90deg,#3498db 0%,#2ecc71 100%); color:#fff; }
+.secondary { background: linear-gradient(90deg,#7f8c8d 0%,#95a5a6 100%); color:#fff; }
+.formButton:disabled { opacity:0.6; cursor:not-allowed; }
+
+.actionLoader { position:relative; }
+.actionLoader .loader { border:3px solid #e0e0e0; border-top:3px solid #3498db; border-radius:50%; width:18px; height:18px; animation:spin 1s linear infinite; display:inline-block; margin-right:0.5rem; }
+@keyframes spin { to { transform:rotate(360deg);} }
+
+.errorMessage { background: linear-gradient(90deg,#e74c3c 0%,#c0392b 100%); color:#fff; padding:0.6rem; border-radius:8px; }
+
+.planListSection { margin-top:0; }
+.sectionTitle { font-size:1.2rem; margin-bottom:0.75rem; background: linear-gradient(to right, #3498db, #2ecc71); -webkit-background-clip:text; background-clip:text; color:transparent; display:flex; gap:0.5rem; align-items:center; }
+
+.loadingText { text-align:center; padding:1rem; color:#b0b0b0; background:linear-gradient(180deg,#34495e 0%,#2c3e50 100%); border-radius:8px; }
+
+/* Search row */
+.searchRow { display:flex; gap:8px; align-items:center; margin-bottom:12px; }
+.searchInput { flex:1; min-width:180px; padding:8px 10px; border-radius:8px; border:1px solid #444; background:linear-gradient(180deg,#2b3344 0%,#232735 100%); color:#e6eef8; }
+.searchActions { display:flex; gap:8px; }
+.btnSearch { background: linear-gradient(90deg,#3498db 0%,#2ecc71 100%); color:#fff; border:none; padding:8px 10px; border-radius:8px; cursor:pointer; font-weight:700; }
+.btnClear { background: linear-gradient(90deg,#7f8c8d 0%,#95a5a6 100%); color:#fff; border:none; padding:8px 10px; border-radius:8px; cursor:pointer; font-weight:700; }
+
+.planList { display:grid; grid-template-columns: 1fr; gap:1rem; }
+
+.card { padding:1rem; background:linear-gradient(135deg,#34495e 0%,#2c3e50 100%); border-radius:8px; box-shadow:0 6px 12px rgba(0,0,0,0.3); }
+.cardHeader { display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem; }
+.planName { font-weight:600; color:#e6eef8; cursor:pointer; }
+.planSpeed { font-weight:600; color:#9fe0ff; }
+.planDescription { color:#bfcbd9; font-size:0.95rem; margin-bottom:0.5rem; }
+.skuStock { color:#b0b0b0; font-size:0.9rem; margin-bottom:0.5rem; }
+
+.cardImages { display:flex; gap:0.5rem; flex-wrap:wrap; margin-bottom:0.5rem; }
+.cardImgLink { border:none; padding:0; background:transparent; cursor:pointer; }
+.cardImg { width:64px; height:64px; object-fit:cover; border-radius:6px; border:1px solid rgba(255,255,255,0.06); }
+
+.imageRow { display:flex; gap:0.5rem; align-items:center; }
+.imgPreview { width:48px; height:48px; object-fit:cover; border-radius:6px; border:1px solid rgba(255,255,255,0.06); }
+.btnRemoveImage { background:#e74c3c; color:#fff; border:none; border-radius:6px; padding:0.25rem 0.5rem; cursor:pointer; }
+.btnAddImage { background:linear-gradient(90deg,#3498db,#2ecc71); color:#fff; border:none; padding:0.5rem 0.75rem; border-radius:6px; cursor:pointer; }
+
+.cardActions { display:flex; gap:0.5rem; }
+.btn { flex:1; padding:0.5rem; border-radius:6px; border:none; cursor:pointer; font-weight:600; }
+.btnEdit { background: linear-gradient(90deg,#3498db 0%,#2ecc71 100%); color:#fff; }
+.btnDelete { background: linear-gradient(90deg,#e74c3c 0%,#c0392b 100%); color:#fff; }
+.btn:disabled { opacity:0.6; cursor:not-allowed; }
+
+/* Pagination */
+.pagination { display:flex; gap:0.5rem; justify-content:center; align-items:center; margin-top:1rem; flex-wrap:wrap; }
+.pageButton { background: linear-gradient(90deg,#2f3b4a 0%,#22303a 100%); color:#dbeaf6; border:none; padding:0.5rem 0.75rem; border-radius:6px; cursor:pointer; font-weight:600; }
+.pageButton:disabled { opacity:0.5; cursor:not-allowed; }
+.pageButtonActive { background: linear-gradient(90deg,#3498db 0%,#2ecc71 100%); color:#fff; }
+
+.imageModal { position:fixed; inset:0; display:flex; align-items:center; justify-content:center; background:rgba(0,0,0,0.6); opacity:0; pointer-events:none; transition:opacity 0.2s ease; }
+.active { opacity:1; pointer-events:auto; }
+.iconList { font-size:1.3rem; }
+.modalImage { max-width:90%; max-height:80vh; border-radius:8px; box-shadow:0 8px 30px rgba(0,0,0,0.6); }
+.closeModal { position:absolute; top:1rem; right:1rem; background:transparent; border:none; color:#fff; font-size:2rem; cursor:pointer; }
+
+/* Toast (confirmation alert) */
+.toast {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  background: linear-gradient(90deg,#2ecc71 0%,#27ae60 100%);
+  color: #fff;
+  padding: 0.6rem 0.9rem;
+  border-radius: 8px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.4);
+  transform: translateY(-8px);
+  opacity: 0;
+  transition: opacity 0.18s ease, transform 0.18s ease;
+  z-index: 1200;
+}
+.toast {
+  /* DEBUG: make toast visually obvious during debugging; remove before production */
+  outline: 3px solid rgba(255,255,255,0.18);
+}
+.toast button {
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 1.1rem;
+  cursor: pointer;
+}
+.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Responsive adjustments */
+@media (max-width: 980px) {
+  .gridLayout { grid-template-columns: 1fr; }
+  .rightCol { order: 2; }
+  .leftCol { order: 1; }
+}
+
+@media (max-width: 480px) {
+  .adminContainer { padding:1rem; }
+  .formGrid { grid-template-columns:1fr; }
+  .formActions, .cardActions { flex-direction:column; }
+  .cardImg { width:48px; height:48px; }
+  .pagination { gap:0.25rem; }
+  .pageButton { padding:0.45rem 0.6rem; font-size:0.95rem; }
+  /* Mobile: stack search elements */
+  .searchRow { flex-direction:column; align-items:stretch; }
+  .searchActions { flex-direction:column; }
+  .btnSearch, .btnClear { width:100%; }
+}
+.inactive {
+  opacity: 0.5;
+  pointer-events: auto;
+}

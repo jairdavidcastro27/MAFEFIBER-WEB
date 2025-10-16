@@ -1,0 +1,10 @@
+---
+import AdminGuard from "../../../components/admin/AdminGuard";
+import Base from "../../../layouts/Base.astro";
+import EditarProductos from "../../../components/productos/EditarProductos";
+---
+
+<Base title="Edicion de productos - MAFEFIBER">
+  <AdminGuard client:load>
+    <EditarProductos client:load />
+  </AdminGuard>

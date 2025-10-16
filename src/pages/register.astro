@@ -1,0 +1,12 @@
+---
+// Importa el componente de registro
+import RegisterForm from "../components/auth/RegisterForm";
+import Base from "../layouts/Base.astro";
+---
+
+<Base>
+  <div class="register-page">
+    <RegisterForm  client:load/>
+  </div>
+</Base>
+

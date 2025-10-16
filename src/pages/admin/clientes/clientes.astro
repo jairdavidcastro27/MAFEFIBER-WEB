@@ -1,0 +1,11 @@
+---
+import AdminGuard from "../../../components/admin/AdminGuard";
+import Base from "../../../layouts/Base.astro";
+import ClientesAdmin from "../../../components/clientes/ClientesAdmin";
+---
+
+<Base title="Clientes - MAFEFIBER">
+  <AdminGuard client:load>
+    <ClientesAdmin client:load />
+  </AdminGuard>
+</Base>

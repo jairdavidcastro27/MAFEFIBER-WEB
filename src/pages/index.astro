@@ -1,0 +1,49 @@
+---
+import Base from "../layouts/Base.astro";
+import PlanList from "../components/plan/PlanList";
+import WhatsAppFloat from '../components/WhatsappFloat';
+
+---
+
+<Base title="Inicio - MafeFiber">
+  <!-- Hero -->
+  <section class="hero" id="inicio">
+    <div class="hero-content">
+      <h1>Fibra Sin Límites</h1>
+      <p>
+       Vive la experiencia de un internet dedicado que nunca baja la velocidad. 
+        Navega, juega y disfruta sin límites con la potencia exclusiva de MafeFiber.
+      </p>
+    </div>
+
+    <div class="cta-buttons">
+      <a href="#planes" class="cta-button cta-primary">🚀 Explorar Planes</a>
+      <a href="#contacto" class="cta-button cta-secondary">💬 Contacta con nosotros </a>
+    </div>
+
+    <!-- Orb de velocidad ubicado debajo de los botones para móviles -->
+    <div class="speed-showcase">
+      <div class="speed-orb">
+        <div class="orb-rings ring-1"></div>
+        <div class="orb-rings ring-2"></div>
+        <div class="orb-rings ring-3"></div>
+        <div class="speed-core">
+          <div class="rocket-container">
+            <img src="/img/rocket-158_512.gif" alt="Rocket" class="rocket">
+            <div class="thrust-particles"></div>
+          </div>
+        </div>
+      </div>
+      <p class="speed-label">Velocidad Garantizada</p>
+    </div>
+  </section>
+
+  <!-- Sección Planes -->
+  <section class="plans" id="planes">
+    <h2>⚡ Planes Extraordinarios</h2>
+    <PlanList client:load />
+  </section>
+
+    <!-- Botón flotante WhatsApp -->
+  <WhatsAppFloat client:load />
+</Base>

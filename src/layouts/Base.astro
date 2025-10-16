@@ -1,0 +1,921 @@
+---
+const { title = "MAFEFIBER" } = Astro.props
+const isAdmin =
+  typeof window !== "undefined" &&
+  JSON.parse(localStorage.getItem("user") || "{}").id_admin;
+  
+ import CartModal from '../components/CartModal';
+    
+---
+
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/img/logofinal.png" />
+    <title>{title}</title>
+    <link rel="stylesheet" href="/style.css" />
+    <style>
+      @media (max-width: 600px) {
+        .animated-bg,
+        .energy-waves,
+        .light-particles {
+          opacity: 0.5 !important;
+          animation-duration: 2.5s !important;
+        }
+        .mobile-overlay,
+        .mobile-menu {
+          backdrop-filter: none !important;
+          background: rgba(0,0,0,0.85) !important;
+        }
+      }
+  /* Small spacing tweak for cart footer controls */
+  #cart-total { margin-right: 12px; }
+  .cart-footer-right { gap: 14px; }
+  /* Buy button style */
+  .cart-buy { background: #ff0078; color: #fff; border: none; padding: 6px 10px; border-radius: 8px; cursor: pointer; }
+  /* Generic cart action button */
+  .cart-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-radius: 10px;
+    border: 1px solid transparent;
+    background: rgba(255,255,255,0.04);
+    color: #e6f9f3;
+    text-decoration: none;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 160ms ease;
+  }
+  .cart-btn:hover { transform: translateY(-1px); background: rgba(255,255,255,0.06); }
+  .cart-btn:active { transform: translateY(0); }
+  .cart-btn:focus { outline: 2px solid rgba(0,255,231,0.16); outline-offset: 2px; }
+  /* Specific variations */
+  a.cart-btn { color: #00ffe7; background: transparent; border-color: transparent; padding: 8px 10px; }
+  .cart-clear.cart-btn { background: rgba(255,255,255,0.02); color: #ffb3b3; border-color: rgba(255,255,255,0.04); }
+  .cart-buy.cart-btn { background: linear-gradient(90deg,#ff6aa3,#ff0078); color: #fff; border: none; box-shadow: 0 6px 18px rgba(255,0,120,0.12); }
+  /* Force button look inside the dropdown (override global site rules) */
+  #cart-dropdown .cart-btn {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    padding: 8px 12px !important;
+    border-radius: 10px !important;
+    border: 1px solid rgba(255,255,255,0.04) !important;
+    background: rgba(255,255,255,0.03) !important;
+    color: #e6f9f3 !important;
+    text-decoration: none !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+    transition: all 160ms ease !important;
+  }
+  #cart-dropdown a.cart-btn { background: transparent !important; color: #00ffe7 !important; border: none !important; }
+  #cart-dropdown .cart-buy.cart-btn { background: linear-gradient(90deg,#ff6aa3,#ff0078) !important; color: #fff !important; box-shadow: 0 6px 18px rgba(255,0,120,0.14) !important; }
+  #cart-dropdown .cart-clear.cart-btn { background: rgba(255,255,255,0.02) !important; color: #ffb3b3 !important; }
+      /* Mobile header cart: hidden on desktop, visible on small screens */
+      .mobile-header-cart { display: none; }
+      @media (max-width: 768px) {
+        /* place the cart absolutely inside the nav so it can sit next to hamburger */
+        nav { position: relative; }
+        .mobile-header-cart {
+          display: inline-block;
+          position: absolute;
+          right: 88px; /* increase gap so it doesn't overlap the hamburger */
+          top: 50%;
+          transform: translateY(-50%);
+          margin: 0;
+          padding: 8px;
+          min-width: 36px;
+          min-height: 36px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          pointer-events: auto;
+          touch-action: manipulation;
+        }
+        /* hamburger sits at the far right; ensure the button doesn't overlap the hamburger */
+        .hamburger { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); z-index: 1001; }
+  /* Ensure the cart button and dropdown sit above the mobile overlay */
+  .mobile-header-cart, #nav-cart { z-index: 1012; }
+  /* make nav sit above overlay and overlay lower than header/cart */
+  nav { z-index: 1010; }
+  .mobile-overlay { z-index: 1000; }
+        /* place dropdown below the nav for mobile (desktop kept absolute) */
+        #cart-dropdown { position: absolute; right: 12px; top: calc(100% + 8px); z-index: 1003; }
+        /* compact fixed panel for mobile when opened: sits near hamburger, limited width */
+        .cart-dropdown--mobile-fixed {
+          position: fixed !important;
+          top: 64px; /* default fallback; JS will compute exact */
+          right: 12px;
+          width: 320px;
+          max-width: calc(100% - 48px);
+          box-shadow: 0 8px 30px rgba(0,0,0,0.45);
+          border-radius: 10px;
+          padding: 12px;
+          background: linear-gradient(180deg, rgba(10,10,10,0.98), rgba(4,4,4,0.98));
+          overflow: auto;
+          max-height: 70vh;
+        }
+        /* fixed dropdown used for desktop and mobile when following the navbar */
+        .cart-dropdown--fixed {
+          position: fixed !important;
+          top: 64px; /* default fallback; JS will compute exact */
+          right: 12px;
+          width: 360px;
+          max-width: calc(100% - 48px);
+          box-shadow: 0 10px 36px rgba(0,0,0,0.5);
+          border-radius: 12px;
+          padding: 14px;
+          background: linear-gradient(180deg, rgba(8,8,8,0.98), rgba(2,2,2,0.98));
+          overflow: auto;
+          max-height: 72vh;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- backgrounds -->
+    <div class="animated-bg"></div>
+    <div class="energy-waves" id="waves"></div>
+    <div class="light-particles" id="light-particles"></div>
+
+    <!-- Overlay para móvil -->
+    <div class="mobile-overlay" id="mobile-overlay"></div>
+
+    <!-- header -->
+    <header>
+      <nav>
+        <div class="logo"><a href="/">⚡ MAFEFIBER</a></div>
+        <!-- Mobile header cart button: will appear beside the hamburger on small screens -->
+        <button id="header-cart-toggle" class="mobile-header-cart" aria-label="Abrir carrito" style="background:transparent;border:none;cursor:pointer;padding:6px;">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="false" role="img" aria-label="Carrito de compras dorado" style="width:20px;height:20px;vertical-align:middle;">
+            <defs>
+              <linearGradient id="goldGrad2" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#ffd27a" />
+                <stop offset="45%" stop-color="#ffb84d" />
+                <stop offset="100%" stop-color="#ff9f1c" />
+              </linearGradient>
+            </defs>
+            <path d="M6.5 6h11l-1.2 6.2a2.2 2.2 0 0 1-2.18 1.8H9.88A2.2 2.2 0 0 1 7.7 12.2L6.5 6z" fill="url(#goldGrad2)" />
+            <path d="M3 3h2.2l1.6 4.5" stroke="#fff8e6" stroke-opacity="0.95" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+            <circle cx="9" cy="19" r="1.25" fill="#fff9f2" opacity="0.95" />
+            <circle cx="18" cy="19" r="1.25" fill="#fff9f2" opacity="0.95" />
+          </svg>
+          <span id="cart-badge-mobile" class="cart-badge" style="display:none;position:absolute;top:0;right:0;transform:translate(30%,-30%);">0</span>
+        </button>
+
+        <!-- Menú desktop -->
+        <ul class="nav-links" id="main-nav-links"></ul>
+        
+        <!-- Botón hamburguesa mejorado -->
+        <button class="hamburger" id="hamburger-btn" aria-label="Abrir menú">
+          <span class="hamburger-line"></span>
+          <span class="hamburger-line"></span>
+          <span class="hamburger-line"></span>
+        </button>
+        
+        <!-- Menú móvil -->
+        <div class="mobile-menu" id="mobile-menu">
+          <ul id="mobile-nav-links"></ul>
+        </div>
+      </nav>
+    </header>
+
+    <main style="margin-top: 80px;">
+      <slot />
+    </main>
+
+    <footer id="contacto">
+      <div class="footer-content">
+        <div class="contact-grid">
+          <div class="contact-card">
+            <div class="contact-icon">📞</div>
+            <h3>Llámanos</h3>
+            <p>956 025 773</p>
+            <p>Disponible 8am a 11pm</p>
+          </div>
+          <div class="contact-card">
+            <div class="contact-icon">✉️</div>
+            <h3>Escríbenos</h3>
+            <p>ameesber@hotmail.com</p>
+            <p>Respuesta en menos de 1 hora</p>
+          </div>
+          <div class="contact-card">
+            <div class="contact-icon">🌐</div>
+            <h3>Síguenos en nuestras redes</h3>
+            <div class="social-icons">
+              <a
+                href="https://www.facebook.com/profile.php?id=61580218216883"
+                target="_blank"
+                rel="noopener"
+                class="social-circle"
+                aria-label="Facebook"
+              >
+                <span>f</span>
+              </a>
+              <a
+                href="https://www.tiktok.com/@mafefiber"
+                target="_blank"
+                rel="noopener"
+                class="social-circle"
+                aria-label="TikTok"
+                style="font-family: Arial, sans-serif"
+              >
+                <span>♪</span>
+              </a>
+            </div>
+          </div>
+          <div class="contact-card">
+            <div class="contact-icon">
+              <img
+                src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg"
+                alt="WhatsApp"
+                style="width: 32px; height: 32px; vertical-align: middle"
+              />
+            </div>
+            <h3>WhatsApp</h3>
+            <p>
+              <a
+                href="https://wa.me/51956025773?text=Buenas%2C%20le%20escribo%20porque%20vi%20su%20p%C3%A1gina%20y%20estoy%20interesado%20en%20contratar%20su%20servicio"
+                target="_blank"
+                rel="noopener"
+                class="maps-link"
+                >Escríbenos por WhatsApp</a
+              >
+            </p>
+            <p>Atención rápida</p>
+          </div>
+        </div>
+        <p>© 2025 MAFEFIBER - Fibra Sin Límites</p>
+      </div>
+    </footer>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        // Cart UI in navbar: helpers
+        const cartBadge = document.getElementById('cart-badge');
+        const cartDropdown = document.getElementById('cart-dropdown');
+        const cartToggle = document.getElementById('cart-toggle');
+        const cartItemsEl = document.getElementById('cart-items');
+        const cartTotalEl = document.getElementById('cart-total');
+        const cartClearBtn = document.getElementById('cart-clear-btn');
+        const cartGoTo = document.getElementById('cart-go-to');
+
+        function readCart() {
+          try { return JSON.parse(localStorage.getItem('cart') || '[]'); } catch(e) { return []; }
+        }
+
+        function renderCart() {
+          const items = readCart();
+          const count = items.reduce((s: number, i: any) => s + i.quantity, 0);
+          if (cartBadge) {
+            if (count>0) { cartBadge.style.display='inline-block'; cartBadge.textContent = String(count); }
+            else cartBadge.style.display='none';
+          }
+          if (cartItemsEl) {
+            cartItemsEl.innerHTML = '';
+            if (items.length===0) cartItemsEl.innerHTML = '<div style="padding:8px;color:#bbb">El carrito está vacío</div>';
+            else {
+              items.forEach((it: any)=>{
+                const div = document.createElement('div');
+                div.style.display='flex'; div.style.justifyContent='space-between'; div.style.padding='6px 0'; div.style.borderBottom='1px solid rgba(255,255,255,0.03)';
+                div.innerHTML = `<div style="flex:1">${it.name} <small style='color:#999'>x${it.quantity}</small></div><div style="margin-left:8px">S/ ${(parseFloat(it.price)*it.quantity).toFixed(2)}</div>`;
+                cartItemsEl.appendChild(div);
+              })
+            }
+          }
+          if (cartTotalEl) {
+            const total = readCart().reduce((s: number, i: any) => s + parseFloat(i.price) * i.quantity, 0);
+            cartTotalEl.textContent = `Total: S/ ${total.toFixed(2)}`;
+          }
+        }
+
+  // Toggle dropdown (the more selective click-to-close logic lives inside initCartBindings)
+  if (cartToggle) cartToggle.addEventListener('click', (e)=>{ e.stopPropagation(); if (cartDropdown) cartDropdown.style.display = cartDropdown.style.display==='block' ? 'none' : 'block'; });
+
+        // Clear cart button
+        if (cartClearBtn) cartClearBtn.addEventListener('click', (e)=>{ e.preventDefault(); localStorage.removeItem('cart'); renderCart(); window.dispatchEvent(new CustomEvent('cart-updated')); });
+  if (cartGoTo) cartGoTo.addEventListener('click',(e)=>{ e.preventDefault(); e.stopPropagation(); window.dispatchEvent(new Event('open-cart-modal')); });
+
+        // Listen to storage events and custom events
+        window.addEventListener('storage', function(e){ if (e.key==='cart') renderCart(); });
+        window.addEventListener('cart-updated', function(){ renderCart();
+          // show temporary notification near badge
+          if (cartBadge) { cartBadge.animate([{transform:'scale(1.2)'},{transform:'scale(1)'}],{duration:250}); }
+        });
+
+        // Initial render
+        renderCart();
+
+        // Usuario y login/logout en desktop y móvil SOLO para admin
+        const user = JSON.parse(localStorage.getItem("user") || "{}");
+        // Desktop nav
+        const navLinks = document.getElementById("main-nav-links");
+        if (navLinks) {
+          navLinks.innerHTML = "";
+          if (user && user.id_admin) {
+            // Saludo
+            const liSaludo = document.createElement("li");
+            liSaludo.innerHTML = `<a style='color: white; text-decoration: none; cursor: default;'>👋 Bienvenido, ${user.full_name || user.username || "Admin"}</a>`;
+            navLinks.appendChild(liSaludo);
+            // Dashboard admin
+            const liDash = document.createElement("li");
+            liDash.innerHTML = `<a href='/admin'>🏠 Dashboard</a>`;
+            navLinks.appendChild(liDash);
+            // Productos
+            const liProd = document.createElement("li");
+            liProd.innerHTML = `<a href='/products'>🛒 Productos</a>`;
+            navLinks.appendChild(liProd);
+            // Cerrar sesión
+            const liLogout = document.createElement("li");
+            liLogout.innerHTML = `<a href=\"#\" id=\"logout-link\">Cerrar sesión</a>`;
+            navLinks.appendChild(liLogout);
+          } else if (user && user.full_name) {
+            // No admin: saludo, productos, logout
+            const liSaludo = document.createElement("li");
+            liSaludo.innerHTML = `<a style='color: white; text-decoration: none; cursor: default;'>👋 Bienvenido, ${user.full_name || user.username || "Usuario"}</a>`;
+            navLinks.appendChild(liSaludo);
+            const liProd = document.createElement("li");
+            liProd.innerHTML = `<a href='/products'>🛒 Productos</a>`;
+            navLinks.appendChild(liProd);
+            const liLogout = document.createElement("li");
+            liLogout.innerHTML = `<a href=\"#\" id=\"logout-link\">Cerrar sesión</a>`;
+            navLinks.appendChild(liLogout);
+          } else {
+            // No logueado: iniciar sesión, productos y contacto
+            const liLogin = document.createElement("li");
+            liLogin.innerHTML = `<a href='/login' id='login-link'>🔑 Iniciar Sesión</a>`;
+            navLinks.appendChild(liLogin);
+            const liProd = document.createElement("li");
+            liProd.innerHTML = `<a href='/products'>🛒 Productos</a>`;
+            navLinks.appendChild(liProd);
+            const liContacto = document.createElement("li");
+            liContacto.innerHTML = `<a href='#contacto'>📞 Contacto</a>`;
+            navLinks.appendChild(liContacto);
+          }
+          // Logout handler (para ambos casos)
+          setTimeout(() => {
+            const logoutLink = document.getElementById("logout-link");
+            if (logoutLink) {
+              logoutLink.onclick = function (e) {
+                e.preventDefault();
+                localStorage.removeItem("token");
+                localStorage.removeItem("user");
+                try { localStorage.removeItem('cart'); } catch(e){}
+                try { window.dispatchEvent(new CustomEvent('cart-updated')); } catch(e){}
+                window.location.href = "/login";
+              };
+            }
+          }, 100);
+          // Inject cart li immediately after the 'Productos' link if present
+          const prodLi = Array.from(navLinks.querySelectorAll('li')).find(li => li.innerHTML.includes('/products'));
+          const cartLi = document.createElement('li');
+          cartLi.innerHTML = `
+            <a href="#" id="nav-cart" class="nav-cart-link" style="position:relative;">
+              <!-- Gold-themed SVG cart: gradient gold + subtle glow -->
+              <svg id="nav-cart-svg" class="nav-cart-svg-large" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="false" role="img" aria-label="Carrito de compras dorado">
+                <defs>
+                  <linearGradient id="goldGrad" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0%" stop-color="#ffd27a" />
+                    <stop offset="45%" stop-color="#ffb84d" />
+                    <stop offset="100%" stop-color="#ff9f1c" />
+                  </linearGradient>
+                  <filter id="goldGlow" x="-50%" y="-50%" width="200%" height="200%">
+                    <feGaussianBlur stdDeviation="2" result="blur" />
+                    <feMerge>
+                      <feMergeNode in="blur" />
+                      <feMergeNode in="SourceGraphic" />
+                    </feMerge>
+                  </filter>
+                </defs>
+                <rect x="0" y="0" width="24" height="24" fill="transparent" />
+                <!-- body filled with gold gradient -->
+                <path d="M6.5 6h11l-1.2 6.2a2.2 2.2 0 0 1-2.18 1.8H9.88A2.2 2.2 0 0 1 7.7 12.2L6.5 6z" fill="url(#goldGrad)" filter="url(#goldGlow)" />
+                <!-- highlight strokes -->
+                <path d="M3 3h2.2l1.6 4.5" stroke="#fff8e6" stroke-opacity="0.95" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+                <!-- wheels -->
+                <circle cx="9" cy="19" r="1.6" fill="#fff9f2" opacity="0.95" />
+                <circle cx="18" cy="19" r="1.6" fill="#fff9f2" opacity="0.95" />
+                <!-- subtle lower shading -->
+                <path d="M7.6 12.2h8.6" stroke="#ffffff" stroke-opacity="0.14" stroke-width="1" stroke-linecap="round" />
+              </svg>
+              <span id="cart-badge" class="cart-badge">0</span>
+            </a>
+            <div id="cart-dropdown" class="cart-dropdown" style="display:none;">
+              <div id="cart-items" class="cart-items"></div>
+              <div class="cart-footer" style="margin-top:8px;display:flex;flex-direction:column;gap:8px;">
+                  <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <strong id="cart-total">Total: S/ 0.00</strong>
+                  </div>
+                  <div class="cart-footer-right" style="display:flex;justify-content:flex-end;gap:10px;align-items:center;">
+                    <a href="#" id="cart-go-to" class="cart-btn" role="button" tabindex="0">Ver carrito</a>
+                    <button id="cart-clear-btn" class="cart-clear cart-btn">Vaciar</button>
+                    <button id="cart-buy-btn" class="cart-buy cart-btn">Comprar</button>
+                  </div>
+                </div>
+            </div>
+          `;
+          if (prodLi) {
+            if (prodLi.nextSibling) navLinks.insertBefore(cartLi, prodLi.nextSibling);
+            else navLinks.appendChild(cartLi);
+          } else {
+            // fallback: place before logout if exists, else append
+            const logoutLi = document.getElementById('logout-link')?.closest('li');
+            if (logoutLi) navLinks.insertBefore(cartLi, logoutLi);
+            else navLinks.appendChild(cartLi);
+          }
+        }
+
+        // Menú móvil SOLO para admin
+        const mobileNavLinks = document.getElementById("mobile-nav-links");
+        if (mobileNavLinks) {
+          mobileNavLinks.innerHTML = "";
+          if (user && user.id_admin) {
+            // Saludo
+            const liSaludo = document.createElement("li");
+            liSaludo.innerHTML = `<a style='color: white; text-decoration: none; cursor: default; display: block; padding: 1.2rem 1.5rem;'>👋 Bienvenido, ${user.full_name || user.username || "Admin"}</a>`;
+            mobileNavLinks.appendChild(liSaludo);
+            // Dashboard admin
+            const liDash = document.createElement("li");
+            liDash.innerHTML = `<a href='/admin'>🏠 Dashboard</a>`;
+            mobileNavLinks.appendChild(liDash);
+            // Productos
+            const liProd = document.createElement("li");
+            liProd.innerHTML = `<a href='/products'>🛒 Productos</a>`;
+            mobileNavLinks.appendChild(liProd);
+            // Cerrar sesión
+            const liLogout = document.createElement("li");
+            liLogout.innerHTML = `<a href=\"#\" id=\"mobile-logout-link\">Cerrar sesión</a>`;
+            mobileNavLinks.appendChild(liLogout);
+          } else if (user && user.full_name) {
+            // No admin: saludo, productos, logout
+            const liSaludo = document.createElement("li");
+            liSaludo.innerHTML = `<a style='color: white; text-decoration: none; cursor: default; display: block; padding: 1.2rem 1.5rem;'>👋 Bienvenido, ${user.full_name || user.username || "Usuario"}</a>`;
+            mobileNavLinks.appendChild(liSaludo);
+            const liProd = document.createElement("li");
+            liProd.innerHTML = `<a href='/products'>🛒 Productos</a>`;
+            mobileNavLinks.appendChild(liProd);
+            const liLogout = document.createElement("li");
+            liLogout.innerHTML = `<a href=\"#\" id=\"mobile-logout-link\">Cerrar sesión</a>`;
+            mobileNavLinks.appendChild(liLogout);
+          } else {
+            // No logueado: iniciar sesión, productos y contacto
+            const liLogin = document.createElement("li");
+            liLogin.innerHTML = `<a href='/login' id='mobile-login-link'>🔑 Iniciar Sesión</a>`;
+            mobileNavLinks.appendChild(liLogin);
+            const liProd = document.createElement("li");
+            liProd.innerHTML = `<a href='/products'>🛒 Productos</a>`;
+            mobileNavLinks.appendChild(liProd);
+            const liContacto = document.createElement("li");
+            liContacto.innerHTML = `<a href='#contacto'>📞 Contacto</a>`;
+            mobileNavLinks.appendChild(liContacto);
+          }
+          // Logout handler (para ambos casos)
+          setTimeout(() => {
+            const mobileLogoutLink = document.getElementById("mobile-logout-link");
+            if (mobileLogoutLink) {
+              mobileLogoutLink.onclick = function (e) {
+                e.preventDefault();
+                localStorage.removeItem("token");
+                localStorage.removeItem("user");
+                try { localStorage.removeItem('cart'); } catch(e){}
+                try { window.dispatchEvent(new CustomEvent('cart-updated')); } catch(e){}
+                window.location.href = "/login";
+              };
+            }
+          }, 100);
+          // Inject cart entry in mobile nav near productos
+          const mobileProd = Array.from(mobileNavLinks.querySelectorAll('li')).find(li => li.innerHTML.includes('/products'));
+          const mobileCartLi = document.createElement('li');
+          // use only a class here to avoid duplicate IDs (header has the primary #cart-badge-mobile)
+          mobileCartLi.innerHTML = `<a href='#' id='mobile-nav-cart' class='mobile-nav-cart'>👜 Carrito <span class='cart-badge-mobile'>0</span></a>`;
+          if (mobileProd) mobileNavLinks.insertBefore(mobileCartLi, mobileProd.nextSibling);
+          else mobileNavLinks.appendChild(mobileCartLi);
+          // Wire mobile nav cart to open inline modal
+          setTimeout(()=>{
+            const mobileNavCart = document.getElementById('mobile-nav-cart');
+            if (mobileNavCart) {
+              mobileNavCart.addEventListener('click', function(e){ e.preventDefault(); e.stopPropagation(); window.dispatchEvent(new Event('open-cart-modal')); closeMenu(); });
+            }
+          }, 50);
+        }
+
+        // Elementos del menú móvil
+        const hamburgerBtn = document.getElementById("hamburger-btn");
+        const mobileMenu = document.getElementById("mobile-menu");
+        const mobileOverlay = document.getElementById("mobile-overlay");
+
+        // Verificar que todos los elementos existan
+        if (!hamburgerBtn || !mobileMenu || !mobileOverlay) {
+          console.warn("Elementos del menú móvil no encontrados");
+          return;
+        }
+
+        // NOTE: header cart toggle is wired inside initCartBindings to avoid duplicate handlers
+
+        // Función para abrir/cerrar menú
+        function toggleMenu() {
+          if (!mobileMenu) return;
+          const isOpen = mobileMenu.classList.contains("open");
+          
+          if (isOpen) {
+            closeMenu();
+          } else {
+            openMenu();
+          }
+        }
+        
+        function openMenu() {
+          if (!mobileMenu || !mobileOverlay || !hamburgerBtn) return;
+          
+          mobileMenu.classList.add("open");
+          mobileOverlay.style.display = "block";
+          hamburgerBtn.classList.add("active");
+          document.body.style.overflow = "hidden"; // Prevenir scroll
+          
+          // Activar overlay después de un pequeño delay
+          setTimeout(() => {
+            if (mobileOverlay) {
+              mobileOverlay.classList.add("active");
+            }
+          }, 10);
+        }
+        
+        function closeMenu() {
+          if (!mobileMenu || !mobileOverlay || !hamburgerBtn) return;
+          
+          mobileMenu.classList.remove("open");
+          mobileOverlay.classList.remove("active");
+          hamburgerBtn.classList.remove("active");
+          document.body.style.overflow = ""; // Restaurar scroll
+          
+          // Ocultar overlay después de la transición
+          setTimeout(() => {
+            if (mobileMenu && !mobileMenu.classList.contains("open") && mobileOverlay) {
+              mobileOverlay.style.display = "none";
+            }
+          }, 300);
+        }
+
+        // Event listeners
+        hamburgerBtn.addEventListener("click", function (e) {
+          e.stopPropagation();
+          toggleMenu();
+        });
+
+        // Cerrar menú al hacer click en el overlay
+        mobileOverlay.addEventListener("click", closeMenu);
+
+        // Cerrar menú al hacer click en un enlace del menú móvil
+        if (mobileMenu) {
+          const mobileLinks = mobileMenu.querySelectorAll("a");
+          mobileLinks.forEach(link => {
+            link.addEventListener("click", () => {
+              closeMenu();
+            });
+          });
+        }
+
+        // Cerrar menú con tecla Escape
+        document.addEventListener("keydown", function(e) {
+          if (e.key === "Escape" && mobileMenu && mobileMenu.classList.contains("open")) {
+            closeMenu();
+          }
+        });
+
+        // After nav is built, wire up cart interactions (badge, dropdown, clear)
+        (function initCartBindings(){
+          const cartBadge = document.getElementById('cart-badge');
+          // primary mobile badge is the header one; fallback to any .cart-badge-mobile in the mobile menu
+          const cartBadgeMobile = document.getElementById('cart-badge-mobile') || document.querySelector('.cart-badge-mobile');
+          const cartDropdown = document.getElementById('cart-dropdown');
+          const cartToggle = document.getElementById('nav-cart');
+          const cartItemsEl = document.getElementById('cart-items');
+          const cartTotalEl = document.getElementById('cart-total');
+          const cartClearBtn = document.getElementById('cart-clear-btn');
+          const cartGoTo = document.getElementById('cart-go-to');
+          const cartBuyBtn = document.getElementById('cart-buy-btn');
+
+          function readCart() { try { return JSON.parse(localStorage.getItem('cart') || '[]'); } catch(e){return [];} }
+          function renderCart(){
+            const items = readCart();
+              const count = items.reduce((s: number, i: any)=>s+i.quantity,0);
+              console.log('[renderCart] items.length=', items.length, 'count=', count);
+            if (cartBadge) { if (count>0){ cartBadge.style.display='inline-block'; cartBadge.textContent=String(count);} else cartBadge.style.display='none'; }
+            if (cartBadgeMobile) { if (count>0){ cartBadgeMobile.style.display='inline-block'; cartBadgeMobile.textContent=String(count);} else cartBadgeMobile.style.display='none'; }
+            // toggle cinematic glow class on mobile header toggle and desktop nav cart
+            try {
+              const headerToggleEl = document.getElementById('header-cart-toggle');
+              const navCartEl = document.getElementById('nav-cart');
+              if (count>0) {
+                if (headerToggleEl) headerToggleEl.classList.add('has-items');
+                if (navCartEl) navCartEl.classList.add('has-items');
+              } else {
+                if (headerToggleEl) headerToggleEl.classList.remove('has-items');
+                if (navCartEl) navCartEl.classList.remove('has-items');
+              }
+            } catch (e) { /* ignore */ }
+            if (cartItemsEl) {
+              cartItemsEl.innerHTML='';
+              if (items.length===0) cartItemsEl.innerHTML = '<div style="padding:8px;color:#bbb">El carrito está vacío</div>';
+              else items.forEach((it:any)=>{ const div=document.createElement('div'); div.style.display='flex'; div.style.justifyContent='space-between'; div.style.padding='6px 0'; div.style.borderBottom='1px solid rgba(255,255,255,0.03)'; div.innerHTML=`<div style="flex:1">${it.name} <small style='color:#999'>x${it.quantity}</small></div><div style="margin-left:8px">S/ ${(parseFloat(it.price)*it.quantity).toFixed(2)}</div>`; cartItemsEl.appendChild(div); });
+              if (cartItemsEl) console.log('[renderCart] cartItemsEl.innerHTML (short) =', cartItemsEl.innerHTML.slice(0,200));
+            }
+            if (cartTotalEl) { const total = readCart().reduce((s: number, i: any)=>s+parseFloat(i.price)*i.quantity,0); cartTotalEl.textContent = `Total: S/ ${total.toFixed(2)}`; }
+          }
+
+          // Helpers to show/hide dropdown appended to body to avoid parent clipping
+          // Track mobile dropdown state so it can follow the navbar on scroll
+          let _mobileDropdownOpen = false;
+          let _mobileDropdownAnchor: Element | null = null;
+
+          let _mobileDropdownTick = false;
+          let _mobileDropdownInterval: number | NodeJS.Timeout | null = null;
+          let _mobileDropdownRO: any = null; // ResizeObserver for anchor
+          const _mobileExtraListeners: Array<{el: EventTarget, ev: string, fn: EventListenerOrEventListenerObject, opts?: any}> = [];
+          function updateMobileDropdownPosition() {
+            try {
+              const dd = document.getElementById('cart-dropdown');
+              if (!dd) return;
+              if (!_mobileDropdownOpen) return;
+              // Try stored anchor, otherwise query live elements each time (more robust)
+              const anchor = _mobileDropdownAnchor || document.getElementById('header-cart-toggle') || document.getElementById('nav-cart');
+              if (!anchor) return;
+              const rect = anchor.getBoundingClientRect();
+              const top = Math.max(8, rect.bottom + 4); // viewport coord
+              dd.style.top = top + 'px';
+              dd.style.right = '12px';
+            } catch (err) {
+              // ignore
+            }
+          }
+
+          function showDropdown(dd: HTMLElement | null, anchorEl?: Element | null) {
+            if (!dd) return;
+            // move to body to escape any overflow:hidden parents
+            if (dd.parentElement !== document.body) document.body.appendChild(dd);
+              // make visible to measure
+              dd.style.display = 'block';
+              dd.style.opacity = '1';
+              dd.style.visibility = 'hidden';
+              dd.style.zIndex = '1105';
+            // measure and position relative to anchor
+            try {
+                const rect = (anchorEl && anchorEl.getBoundingClientRect) ? anchorEl.getBoundingClientRect() : { left: window.innerWidth - 16, right: window.innerWidth - 8, bottom: 48 };
+                const ddRect = dd.getBoundingClientRect();
+                // Use a fixed, follow-the-navbar panel on both desktop and mobile
+                dd.classList.remove('cart-dropdown--mobile');
+                dd.classList.add('cart-dropdown--fixed');
+                // compute a position near the top-right (near anchor). If anchor is provided, align to its right edge.
+                const top = Math.max(8, rect.bottom + 4); // viewport coord
+                dd.style.top = top + 'px';
+                dd.style.right = '12px';
+                dd.style.left = 'auto';
+                // mark as open and remember anchor so we can update position on scroll
+                _mobileDropdownOpen = true;
+                _mobileDropdownAnchor = anchorEl || document.getElementById('header-cart-toggle') || document.getElementById('nav-cart');
+                // ensure dropdown is fixed and start aggressive tracking so it follows the nav while open
+                dd.style.position = 'fixed';
+                if (_mobileDropdownInterval) clearInterval(_mobileDropdownInterval as any);
+                _mobileDropdownInterval = setInterval(updateMobileDropdownPosition, 120);
+                // ResizeObserver to follow size/position changes of the anchor
+                try {
+                  const anchorNode = _mobileDropdownAnchor || document.getElementById('header-cart-toggle') || document.getElementById('nav-cart');
+                  if (window.ResizeObserver && anchorNode) {
+                    _mobileDropdownRO = new ResizeObserver(updateMobileDropdownPosition);
+                    _mobileDropdownRO.observe(anchorNode);
+                  }
+                } catch (roErr) { /* ignore */ }
+                // add extra listeners (wheel / pointermove) to react to rapid changes
+                const wheelFn = function(){ updateMobileDropdownPosition(); };
+                window.addEventListener('wheel', wheelFn, { passive: true });
+                _mobileExtraListeners.push({ el: window, ev: 'wheel', fn: wheelFn });
+                const pmFn = function(){ updateMobileDropdownPosition(); };
+                window.addEventListener('pointermove', pmFn, { passive: true });
+                _mobileExtraListeners.push({ el: window, ev: 'pointermove', fn: pmFn });
+                dd.style.maxHeight = '72vh';
+                dd.style.overflow = 'auto';
+            } catch (e) {
+              // fallback: pinned to top-right
+                dd.style.right = '12px';
+                dd.style.top = (48 + window.scrollY) + 'px';
+            }
+            dd.style.visibility = 'visible';
+          }
+          function hideDropdown(dd: HTMLElement | null) {
+            if (!dd) return;
+            // clear open state so scroll handler no longer repositions
+            _mobileDropdownOpen = false;
+            _mobileDropdownAnchor = null;
+            // clear polling
+            try { if (_mobileDropdownInterval) { clearInterval(_mobileDropdownInterval as any); _mobileDropdownInterval = null; } } catch(e){}
+            // disconnect ResizeObserver
+            try { if (_mobileDropdownRO) { _mobileDropdownRO.disconnect(); _mobileDropdownRO = null; } } catch(e){}
+            // remove extra listeners
+            try {
+              _mobileExtraListeners.forEach(l=>{ try{ (l.el as any).removeEventListener(l.ev, l.fn, l.opts); }catch(e){} });
+              _mobileExtraListeners.length = 0;
+            } catch(e){}
+            dd.style.display = 'none';
+            // optionally keep it in body
+          }
+
+          // Keep mobile dropdown docked to the right as the user scrolls or resizes
+          function _onScrollRaf(){ if (!_mobileDropdownOpen) return; if (!_mobileDropdownTick){ _mobileDropdownTick = true; requestAnimationFrame(function(){ updateMobileDropdownPosition(); _mobileDropdownTick = false; }); } }
+          window.addEventListener('scroll', _onScrollRaf, { passive: true });
+          // Also listen on document/body and touch events for cases where scrolling isn't on window
+          document.addEventListener('scroll', _onScrollRaf, { passive: true, capture: true });
+          document.body.addEventListener('scroll', _onScrollRaf, { passive: true, capture: true });
+          window.addEventListener('touchmove', _onScrollRaf, { passive: true });
+          document.addEventListener('touchmove', _onScrollRaf, { passive: true });
+          window.addEventListener('resize', function(){ if (_mobileDropdownOpen) updateMobileDropdownPosition(); });
+
+          if (cartToggle) cartToggle.addEventListener('click', function(e: Event){
+            e.preventDefault();
+            e.stopPropagation();
+            const dd = document.getElementById('cart-dropdown');
+            // Safely derive anchor as Element | null from Event.currentTarget
+            let anchor: Element | null = document.getElementById('nav-cart');
+            if (e.currentTarget && e.currentTarget instanceof Element) anchor = e.currentTarget;
+            console.log('[toggle] nav-cart click, dd=', dd, 'before=', dd?dd.style.display:null);
+            if (dd) {
+              if (dd.style.display === 'block') { hideDropdown(dd); }
+              else { showDropdown(dd, anchor); }
+              console.log('[toggle] nav-cart after=', dd.style.display);
+            }
+          });
+          // Header cart toggle (mobile) - use same dropdown
+          const headerCartToggle = document.getElementById('header-cart-toggle');
+          if (headerCartToggle) headerCartToggle.addEventListener('click', function(e: Event){
+            e.preventDefault();
+            e.stopPropagation();
+            const dd = document.getElementById('cart-dropdown');
+            // Safely derive anchor as Element | null from Event.currentTarget
+            let anchor: Element | null = headerCartToggle;
+            if (e.currentTarget && e.currentTarget instanceof Element) anchor = e.currentTarget;
+            console.log('[toggle] header-cart-toggle click, dd=', dd, 'before=', dd?dd.style.display:null);
+            if (dd) {
+              if (dd.style.display === 'block') { hideDropdown(dd); }
+              else { showDropdown(dd, anchor); }
+              console.log('[toggle] header-cart-toggle after=', dd.style.display);
+            }
+          });
+          // Click outside to close dropdown: ignore clicks originated from toggles
+          document.addEventListener('click', (ev)=>{ const dd=document.getElementById('cart-dropdown'); if (!dd) return; const target = ev.target; if (target instanceof Element && (target.closest && (target.closest('#nav-cart') || target.closest('#header-cart-toggle') || target.closest('#cart-dropdown')))) return; hideDropdown(dd); });
+          if (cartClearBtn) cartClearBtn.addEventListener('click',(e)=>{ e.preventDefault(); localStorage.removeItem('cart'); renderCart(); window.dispatchEvent(new CustomEvent('cart-updated')); });
+          if (cartGoTo) cartGoTo.addEventListener('click',(e)=>{ e.preventDefault(); e.stopPropagation(); window.dispatchEvent(new Event('open-cart-modal')); });
+          if (cartBuyBtn) cartBuyBtn.addEventListener('click', (e)=>{
+            e.preventDefault();
+            try {
+              const cart = readCart();
+              if(!cart || cart.length === 0){ alert('El carrito está vacío'); return; }
+              const waNumber = '51956025773'; // change if necessary
+              const header = 'Buenas tardes señor Americo, vengo de la pagina y deseo comprar los siguientes productos. Espero su respuesta.';
+              const lines = [header, ''];
+              let total = 0;
+              for (let i = 0; i < cart.length; i++){
+                const it = cart[i];
+                const qty = Number(it.quantity) || 1;
+                const price = Number(it.price) || 0;
+                const subtotal = qty * price;
+                total += subtotal;
+                lines.push(`${i+1}. ${it.name || 'Producto'} - Cantidad: ${qty} - Precio unit.: S/ ${price.toFixed(2)} - Subtotal: S/ ${subtotal.toFixed(2)}`);
+              }
+              lines.push('');
+              lines.push(`Total: S/ ${total.toFixed(2)}`);
+              const message = lines.join('\n');
+              const payload = encodeURIComponent(message);
+              const url = `https://wa.me/${waNumber}?text=${payload}`;
+              window.open(url, '_blank');
+            } catch(err) {
+              console.error('Failed to open WhatsApp from header buy button', err);
+              window.location.href = '/checkout';
+            }
+          });
+
+          // track previous cart count so we can detect additions
+          let _prevCartCount = readCart().reduce((s: number, i: any)=>s + (i.quantity||0), 0);
+          window.addEventListener('storage', function(e){ if (e.key==='cart') renderCart(); });
+          window.addEventListener('cart-updated', function(){ 
+            try {
+              const newCount = readCart().reduce((s: number, i: any)=>s + (i.quantity||0), 0);
+              // if items were added (increase in count), auto-open the dropdown
+              if (newCount > _prevCartCount) {
+                const dd = document.getElementById('cart-dropdown');
+                const anchor = document.getElementById('header-cart-toggle') || document.getElementById('nav-cart');
+                if (dd) showDropdown(dd, anchor as any);
+              }
+              _prevCartCount = newCount;
+            } catch (e) { /* ignore */ }
+            renderCart(); 
+            if (cartBadge){ cartBadge.animate([{transform:'scale(1.2)'},{transform:'scale(1)'}],{duration:250}); }
+            if (cartBadgeMobile){ cartBadgeMobile.animate([{transform:'scale(1.2)'},{transform:'scale(1)'}],{duration:250}); }
+            // pulse the SVG and add glow on desktop
+            const cartLink = document.getElementById('nav-cart');
+            if (cartLink) {
+              cartLink.classList.add('animate','has-items');
+              // remove animate after animation
+              setTimeout(()=>{ cartLink.classList.remove('animate'); }, 420);
+            }
+            // also pulse mobile header toggle briefly
+            try {
+              const headerToggleEl = document.getElementById('header-cart-toggle');
+              if (headerToggleEl) {
+                headerToggleEl.classList.add('animate');
+                setTimeout(()=>{ headerToggleEl.classList.remove('animate'); }, 420);
+              }
+            } catch(e){}
+          });
+
+          // Allow external code to explicitly open the cart (e.g. when Add to cart button is clicked)
+          window.addEventListener('open-cart', function(e){
+            try {
+              const dd = document.getElementById('cart-dropdown');
+              const anchor = document.getElementById('header-cart-toggle') || document.getElementById('nav-cart');
+              if (dd) showDropdown(dd, anchor as any);
+            } catch (err) { /* ignore */ }
+          });
+
+          // Ensure SVG size is correct and responsive (override external/global rules)
+          function adjustCartSvgSize() {
+            const svg = document.getElementById('nav-cart-svg') as SVGElement | null;
+            if (!svg) return;
+            const w = window.innerWidth;
+            if (w <= 480) {
+              svg.style.setProperty('width', '18px', 'important');
+              svg.style.setProperty('height', '18px', 'important');
+            } else if (w <= 768) {
+              svg.style.setProperty('width', '20px', 'important');
+              svg.style.setProperty('height', '20px', 'important');
+            } else {
+              svg.style.setProperty('width', '22px', 'important');
+              svg.style.setProperty('height', '22px', 'important');
+            }
+          }
+
+          window.addEventListener('resize', adjustCartSvgSize);
+          adjustCartSvgSize();
+
+          renderCart();
+
+        // DEBUG: attach extra listeners (capture + bubble) to verify clicks reach the toggles
+        const debugHeader = document.getElementById('header-cart-toggle');
+        const debugNavCart = document.getElementById('nav-cart');
+        if (debugHeader) {
+          debugHeader.addEventListener('click', function(e){ console.log('[debug] header-cart-toggle click (bubble)'); }, false);
+          debugHeader.addEventListener('click', function(e){ console.log('[debug] header-cart-toggle click (capture)'); }, true);
+        }
+        if (debugNavCart) {
+          debugNavCart.addEventListener('click', function(e){ console.log('[debug] nav-cart click (bubble)'); }, false);
+          debugNavCart.addEventListener('click', function(e){ console.log('[debug] nav-cart click (capture)'); }, true);
+        }
+        })();
+
+        // Usuario y login/logout en móvil
+        const mobileWelcomeUser = document.getElementById("mobile-welcome-user");
+        const mobileLoginLink = document.getElementById("mobile-login-link");
+        const mobileLogoutLi = document.getElementById("mobile-logout-li");
+        
+        if (mobileWelcomeUser) {
+          if (user && user.full_name) {
+            mobileWelcomeUser.innerHTML = `<a style="color: white; text-decoration: none; cursor: default; display: block; padding: 1.2rem 1.5rem;">👋 Bienvenido, ${user.full_name}</a>`;
+            if (mobileLoginLink) mobileLoginLink.style.display = "none";
+            if (mobileLogoutLi) mobileLogoutLi.style.display = "block";
+          } else {
+            mobileWelcomeUser.textContent = "";
+            if (mobileLoginLink) mobileLoginLink.style.display = "block";
+            if (mobileLogoutLi) mobileLogoutLi.style.display = "none";
+          }
+        }
+        
+        const mobileLogoutLink = document.getElementById("mobile-logout-link");
+        if (mobileLogoutLink) {
+          mobileLogoutLink.onclick = function (e) {
+            e.preventDefault();
+            localStorage.removeItem("token");
+            localStorage.removeItem("user");
+            try { localStorage.removeItem('cart'); } catch(e){}
+            try { window.dispatchEvent(new CustomEvent('cart-updated')); } catch(e){}
+            window.location.href = "/login";
+          };
+        }
+
+        // Cerrar menú en redimensión de ventana
+        window.addEventListener("resize", function() {
+          if (window.innerWidth > 768 && mobileMenu && mobileMenu.classList.contains("open")) {
+            closeMenu();
+          }
+        });
+      });
+    </script>
+    <!-- Cart modal moved to a dedicated component (src/components/CartModal.tsx) -->
+
+
+    <CartModal client:load />
+  </body>
+</html>

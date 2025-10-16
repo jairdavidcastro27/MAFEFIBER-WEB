@@ -1,0 +1,11 @@
+---
+import Base from "../layouts/Base.astro";
+import ProductsComponent from "../components/productos/products";
+import WhatsAppFloat from '../components/WhatsappFloat';
+---
+
+<Base title="Productos - MAFEFIBER">
+  <ProductsComponent client:load />
+  <!-- Botón flotante WhatsApp -->
+  <WhatsAppFloat client:load /> 
+</Base>

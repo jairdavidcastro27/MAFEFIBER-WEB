@@ -1,0 +1,13 @@
+---
+import Base from "../../../layouts/Base.astro";
+import EditarPlan from "../../../components/plan/editarPlan";
+
+import PlanCard from "../../../components/plan/PlanCard";
+import PlanList from "../../../components/plan/PlanList";
+import AdminGuard from "../../../components/admin/AdminGuard";
+---
+<Base title="Planes - MAFEFIBER">
+  <AdminGuard client:load>
+    <EditarPlan client:load />
+  </AdminGuard>
+</Base>

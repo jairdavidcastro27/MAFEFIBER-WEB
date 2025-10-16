@@ -1,0 +1,311 @@
+/* =======================================================
+   CYBERPUNK STYLE - Fondo oscuro con animación
+   ======================================================= */
+
+/* === FONDO CYBERPUNK === */
+.cyberpunk-bg {
+  min-height: calc(100vh - 0px);
+  background: linear-gradient(135deg, #1e1e2f, #2c2c3e, #3a3a4f);
+  background-size: 400% 400%;
+  animation: gradientAnimation 12s ease infinite;
+  position: relative;
+  overflow: hidden;
+  padding-top: 0 !important;
+}
+
+@keyframes gradientAnimation {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* =======================================================
+   HEADER
+   ======================================================= */
+.header-glow {
+  text-align: center;
+  padding: 1.2rem 1rem 1.2rem 1rem;
+  margin-top: 2.5rem;
+}
+
+.section-title {
+  font-size: 3rem;
+  font-weight: 900;
+  color: #ff00ff;
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+  position: relative;
+}
+
+.glitch-text {
+  
+  position: relative;
+  color: #0ff;
+  text-shadow: 0 0 5px #0ff,
+               0 0 10px #ff00ff,
+               0 0 20px #0ff;
+  animation: glitch 1s infinite;
+}
+
+@keyframes glitch {
+  0%   { text-shadow: 2px 2px #ff00ff, -2px -2px #00fff7; }
+  20%  { text-shadow: -2px -2px #ff00ff, 2px 2px #00fff7; }
+  40%  { text-shadow: 2px -2px #ff00ff, -2px 2px #00fff7; }
+  60%  { text-shadow: -2px 2px #ff00ff, 2px -2px #00fff7; }
+  80%  { text-shadow: 2px 2px #ff00ff, -2px -2px #00fff7; }
+  100% { text-shadow: none; }
+}
+
+.subtitle {
+  color: #ccc;
+  font-size: 1.2rem;
+}
+
+/* Search row */
+.search-row { display:flex; gap:10px; justify-content:center; align-items:center; margin-top:12px; }
+.search-input { min-width:260px; max-width:520px; padding:8px 12px; border-radius:8px; border:1px solid rgba(255,255,255,0.06); background:rgba(0,0,0,0.35); color:#fff; }
+.search-actions { display:flex; gap:8px; }
+.btn-search, .btn-clear { padding:8px 12px; border-radius:8px; border:none; font-weight:700; cursor:pointer; }
+.btn-search { background: linear-gradient(90deg,#ff00ff,#00fff7); color:#111; }
+.btn-clear { background: rgba(255,255,255,0.06); color:#fff; }
+
+/* =======================================================
+   GRID DE PRODUCTOS
+   ======================================================= */
+.products-grid {
+  display: grid;
+  /* Keep cards a consistent max width so a single result doesn't stretch the card */
+  grid-template-columns: repeat(auto-fit, minmax(280px, 320px));
+  gap: 2rem;
+  padding: 2rem;
+  max-width: 1200px;
+  margin: auto;
+  justify-content: center; /* center grid when few items */
+  justify-items: center; /* ensure each grid item is centered */
+  grid-auto-rows: 1fr; /* make rows equal height so cards align */
+}
+
+/* =======================================================
+   CARD DE PRODUCTOS
+   ======================================================= */
+.product-card {
+  background: rgba(15, 15, 30, 0.9);
+  border-radius: 12px;
+  position: relative;
+  overflow: hidden;
+  border: 2px solid rgba(0, 255, 255, 0.18);
+  box-shadow: 0 0 18px rgba(255, 0, 255, 0.18),
+              0 0 30px rgba(0, 255, 255, 0.12);
+  transition: transform 220ms ease, box-shadow 220ms ease;
+  display: flex;
+  flex-direction: column;
+  /* Make cards much shorter and more compact */
+  min-height: 360px;
+  width: 100%;
+  max-width: 300px; /* slightly narrower to encourage portrait images */
+  box-sizing: border-box;
+}
+
+.product-card:hover {
+  transform: translateY(-10px) scale(1.05);
+  box-shadow: 0 0 30px #ff00ff, 0 0 60px #00fff7;
+  border-color: #ff00ff;
+}
+
+.product-image {
+  width: 100%;
+  /* make images portrait-oriented but more compact */
+  height: 200px;
+  max-height: 220px;
+  object-fit: cover; /* crop to fill area nicely */
+  background: #111; /* fallback */
+  display: block;
+}
+
+.product-content {
+  padding: 0.5rem 0.75rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 0.28rem; /* tighten vertical spacing further */
+  flex: 1 1 auto; /* allow content to take remaining space without stretching image */
+}
+
+.product-name {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #00fff7;
+  margin-bottom: 0.35rem;
+}
+
+.product-description {
+  font-size: 0.95rem;
+  color: #ddd;
+  margin-bottom: 0.25rem;
+  /* prevent very long descriptions from expanding the card */
+  max-height: 3.2rem; /* ~3 lines */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+
+.specs-list {
+  margin: 0.45rem 0 0.6rem;
+  padding: 0;
+  list-style: none;
+  color: #ccc;
+  font-size: 0.88rem;
+  text-align: left;
+  max-height: 4.2rem;
+  overflow: auto;
+}
+
+.spec-item {
+  margin-bottom: 0.5rem;
+}
+
+.price-section {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #ff00ff;
+  margin: 0.2rem 0 0.45rem 0; /* reduce top margin so price sits closer to description */
+}
+
+/* =======================================================
+   BOTONES
+   ======================================================= */
+.product-button {
+  width: 100%;
+  padding: 0.6rem 1rem;
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  font-weight: 800;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 1.6px;
+  cursor: pointer;
+  position: relative;
+  background: linear-gradient(90deg, #ff00ff, #00fff7, #ff00ff);
+  background-size: 300%;
+  animation: glowmove 5s linear infinite;
+  overflow: hidden;
+}
+
+@keyframes glowmove {
+  0%   { background-position: 0%; }
+  100% { background-position: 300%; }
+}
+
+.button-scan {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.14);
+  transform: skewX(-18deg);
+  animation: scan 2s infinite;
+}
+
+@keyframes scan {
+  0%   { left: -100%; }
+  50%  { left: 100%; }
+  100% { left: 100%; }
+}
+
+/* =======================================================
+   EFECTO BORDE
+   ======================================================= */
+.card-border {
+  position: absolute;
+  inset: 0;
+  border: 2px solid rgba(0, 255, 255, 0.5);
+  border-radius: 15px;
+  pointer-events: none;
+}
+
+/* Miniaturas */
+.gallery-thumbs {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.35rem;
+}
+
+.gallery-thumbs .thumb {
+  width: 44px;
+  height: 44px;
+  object-fit: cover;
+  border: 2px solid transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: transform 0.16s ease, border 0.16s ease;
+  background: #111;
+}
+
+.gallery-thumbs .thumb:hover {
+  transform: scale(1.1);
+  border-color: #00fff7;
+}
+
+.gallery-thumbs .thumb.active {
+  border-color: #ff00ff;
+  box-shadow: 0 0 10px #ff00ff;
+}
+
+/* PAGINACIÓN CYBERPUNK */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 2rem 0 1rem 0;
+}
+
+.pagination button {
+  background: linear-gradient(90deg, #ff00ff, #00fff7, #ff00ff);
+  background-size: 200%;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.6rem 1.2rem;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 0 10px #ff00ff44, 0 0 20px #00fff744;
+  transition: background 0.3s, transform 0.2s, box-shadow 0.2s;
+  outline: none;
+  position: relative;
+  z-index: 1;
+}
+
+.pagination button:hover:not(:disabled),
+.pagination button.active {
+  background: #1e1e2f;
+  color: #ff00ff;
+  border: 2px solid #00fff7;
+  box-shadow: 0 0 20px #00fff7, 0 0 40px #ff00ff;
+}
+
+.pagination button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: #222;
+  color: #888;
+  box-shadow: none;
+  border: 2px solid #333;
+}
+
+@media (max-width: 768px) {
+  .search-row { flex-direction:column; gap:8px; }
+  .search-actions { width:100%; display:flex; gap:8px; }
+  .btn-search, .btn-clear { width:100%; }
+  /* On small screens allow cards to size naturally to avoid huge min-heights */
+  .products-grid { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+  .product-card { min-height: auto; max-width: 100%; }
+}

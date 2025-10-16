@@ -1,0 +1,11 @@
+node_modules
+dist
+.astro
+.git
+.gitignore
+.idea
+.vscode
+.DS_Store
+*.log
+.env
+.env.production

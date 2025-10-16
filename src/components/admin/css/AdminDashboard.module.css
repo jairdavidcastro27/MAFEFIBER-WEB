@@ -1,0 +1,129 @@
+/* Fondo animado */
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.dashboard {
+  min-height: calc(100vh - 64px);
+  width: 100%;
+  animation: gradientShift 10s ease infinite;
+  background: linear-gradient(45deg, #0a0a0a, #1a0033, #000d1a, #001122);
+  background-size: 400% 400%;
+  font-family: "Segoe UI", Arial, sans-serif;
+  padding: 2.5rem 5vw;
+}
+
+/* Encabezados */
+.title {
+  font-size: 2.7rem;
+  font-weight: 800;
+  color: #00ffff;
+  margin-bottom: 0.5rem;
+  text-align: center;
+  letter-spacing: -1px;
+  text-shadow: 0 2px 16px #001122;
+}
+
+.subtitle {
+  font-size: 1.25rem;
+  color: #e0e7ff;
+  margin-bottom: 2.5rem;
+  text-align: center;
+  text-shadow: 0 1px 8px #001122;
+}
+
+/* Contenedor de tarjetas */
+.cardsContainer {
+  display: flex;
+  gap: 2rem;
+  justify-content: center;
+  align-items: stretch;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+/* Tarjetas base */
+.card {
+  flex: 1 1 300px;
+  padding: 2.2rem 1.7rem;
+  border-radius: 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 180px;
+}
+
+.cardTitle {
+  font-size: 1.35rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  text-align: center;
+  color: #fff;
+}
+
+.cardText {
+  font-size: 1.05rem;
+  opacity: 0.92;
+  text-align: center;
+  color: #e0e7ff;
+}
+
+/* --- Tarjeta Usuarios --- */
+.cardUsuarios {
+  background: rgba(25, 45, 65, 0.85);
+  color: #00ffff;
+  box-shadow: 0 6px 24px #001122;
+  border: 1px solid #00ffff;
+}
+
+.cardUsuarios .cardTitle {
+  text-shadow: 0 1px 8px #00ffff;
+}
+
+/* --- Tarjeta Planes --- */
+.cardPlanes {
+  background: rgba(36, 0, 70, 0.85);
+  color: #b659f8;
+  box-shadow: 0 6px 24px #1a0033;
+  border: 1px solid #b659f8;
+}
+
+.cardPlanes .cardTitle {
+  text-shadow: 0 1px 8px #b659f8;
+}
+
+.cardButton {
+  display: inline-block;
+  margin-top: 1.2rem;
+  padding: 0.7rem 1.5rem;
+  background: #b659f8;
+  color: #fff;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1rem;
+  text-decoration: none;
+  box-shadow: 0 2px 8px #1a0033;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+}
+
+.cardButton:hover {
+  background: #a13be0;
+  transform: translateY(-2px);
+}
+
+/* --- Tarjeta Reportes --- */
+.cardReportes {
+  background: rgba(0, 17, 34, 0.85);
+  color: #ffd93d;
+  box-shadow: 0 6px 24px #000d1a;
+  border: 1px solid #ffd93d;
+}
+
+.cardReportes .cardTitle {
+  text-shadow: 0 1px 8px #ffd93d;
+}

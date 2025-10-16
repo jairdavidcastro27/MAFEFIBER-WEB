@@ -1,0 +1,21 @@
+---
+import Base from '../layouts/Base.astro';
+import LoginForm from '../components/auth/LoginForm';
+
+---
+
+<Base title="Iniciar sesison - MAFEFIBER">
+    <div class="login-page">
+        <LoginForm client:load/>
+    </div>
+</Base>
+
+<style>
+    .login-page {
+        min-height: 80vh;
+        display: flex;
+        justify-content: center;
+        justify-content: center;
+        padding: 2rem;
+    }
+</style>
