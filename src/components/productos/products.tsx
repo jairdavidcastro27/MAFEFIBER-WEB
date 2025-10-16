@@ -185,6 +185,15 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, delay, addToCart }) 
   const [isZoomed, setIsZoomed] = useState(false);
   const [zoomPosition, setZoomPosition] = useState({ x: 50, y: 50 });
 
+
+  const handleTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const touch = e.touches[0];
+    setZoomPosition({
+      x: ((touch.clientX - rect.left) / rect.width) * 100,
+      y: ((touch.clientY - rect.top) / rect.height) * 100,
+    });
+  };
   return (
     <div className="product-card" data-aos="fade-up" data-aos-delay={delay}>
       <div
@@ -198,6 +207,10 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, delay, addToCart }) 
             y: ((e.clientY - rect.top) / rect.height) * 100,
           });
         }}
+
+        onTouchStart={() => setIsZoomed(true)}
+        onTouchEnd={() => setIsZoomed(false)}
+        onTouchMove={handleTouchMove}
       >
         <img
           src={selectedImage}
