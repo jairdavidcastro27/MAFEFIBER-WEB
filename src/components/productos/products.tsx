@@ -182,10 +182,37 @@ type ProductCardProps = {
 const ProductCard: React.FC<ProductCardProps> = ({ product, delay, addToCart }) => {
   const images = product.images && product.images.length > 0 ? product.images : [""];
   const [selectedImage, setSelectedImage] = useState(images[0]);
+  const [isZoomed, setIsZoomed] = useState(false);
+  const [zoomPosition, setZoomPosition] = useState({ x: 50, y: 50 });
 
   return (
     <div className="product-card" data-aos="fade-up" data-aos-delay={delay}>
-      <img src={selectedImage} alt={product.name} className="product-image" />
+      <div
+        className="product-image-zoom-container"
+        onMouseEnter={() => setIsZoomed(true)}
+        onMouseLeave={() => setIsZoomed(false)}
+        onMouseMove={e => {
+          const rect = (e.currentTarget as HTMLDivElement).getBoundingClientRect();
+          setZoomPosition({
+            x: ((e.clientX - rect.left) / rect.width) * 100,
+            y: ((e.clientY - rect.top) / rect.height) * 100,
+          });
+        }}
+      >
+        <img
+          src={selectedImage}
+          alt={product.name}
+          className={`product-image${isZoomed ? " zoomed" : ""}`}
+          style={
+            isZoomed
+              ? { transformOrigin: `${zoomPosition.x}% ${zoomPosition.y}%` }
+              : undefined
+          }
+        />
+      </div>
+
+
+     
       <div className="gallery-thumbs">
         {(product.images || []).map((img, i) => (
           <img

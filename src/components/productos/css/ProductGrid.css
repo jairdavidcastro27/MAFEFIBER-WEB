@@ -100,10 +100,13 @@
   display: flex;
   flex-direction: column;
   /* Make cards much shorter and more compact */
-  min-height: 360px;
-  width: 100%;
-  max-width: 300px; /* slightly narrower to encourage portrait images */
+  min-height: 480px;
+  width: 320px;
+  align-items: center;
+  padding: 20px 16px 16px 16px;
   box-sizing: border-box;
+  overflow: visible;
+
 }
 
 .product-card:hover {
@@ -113,12 +116,14 @@
 }
 
 .product-image {
-  width: 100%;
+  width: 90%;
   /* make images portrait-oriented but more compact */
-  height: 200px;
+  height: 220px;
   max-height: 220px;
-  object-fit: cover; /* crop to fill area nicely */
-  background: #111; /* fallback */
+  object-fit: contain; /* Prevents cropping, shows full image */
+  border-radius: 12px;
+  background: #222;
+  margin-bottom: 12px;
   display: block;
 }
 
@@ -132,24 +137,18 @@
 }
 
 .product-name {
-  font-size: 1.25rem;
-  font-weight: 800;
-  color: #00fff7;
-  margin-bottom: 0.35rem;
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin: 8px 0 4px 0;
+  text-align: center;
+  word-break: break-word;
+  white-space: normal;
 }
 
 .product-description {
-  font-size: 0.95rem;
-  color: #ddd;
-  margin-bottom: 0.25rem;
-  /* prevent very long descriptions from expanding the card */
-  max-height: 3.2rem; /* ~3 lines */
-  overflow: hidden;
-  text-overflow: ellipsis;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  line-clamp: 3;
-  -webkit-box-orient: vertical;
+font-size: 1rem;
+  margin-bottom: 8px;
+  text-align: center;
 }
 
 .specs-list {
@@ -232,9 +231,10 @@
 /* Miniaturas */
 .gallery-thumbs {
   display: flex;
-  justify-content: center;
-  gap: 0.5rem;
-  padding: 0.35rem;
+  gap: 6px;
+  margin-bottom: 10px;
+  overflow-x: auto;
+  max-width: 90%;
 }
 
 .gallery-thumbs .thumb {
@@ -308,4 +308,26 @@
   /* On small screens allow cards to size naturally to avoid huge min-heights */
   .products-grid { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
   .product-card { min-height: auto; max-width: 100%; }
+}
+
+.product-image-zoom-container {
+  width: 90%;
+  height: 220px;
+  overflow: hidden;
+  border-radius: 12px;
+  background: #222;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: zoom-in;
+  position: relative;
+}
+
+.product-image.zoomed {
+  transform: scale(2);
+  transition: transform 0.2s cubic-bezier(.4,2,.6,1), box-shadow 0.2s;
+  cursor: zoom-out;
+  z-index: 2;
+  box-shadow: 0 0 16px 4px rgba(0,0,0,0.25);
 }
